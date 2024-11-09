@@ -9,11 +9,11 @@ Docker Image: https://hub.docker.com/r/louislam/uptime-kuma
 
 | Option | Default Value |
 | ---- | ---- |
-| app_uptime_kuma_docker_volume | uptime-kuma_data |
-| app_uptime_kuma_docker_image | docker.io/louislam/uptime-kuma |
-| app_uptime_kuma_docker_container | uptime-kuma |
-| app_uptime_kuma_docker_network | app-network |
-| app_uptime_kuma_cloudflared_token | |
+| role_uptime_kuma_image | docker.io/louislam/uptime-kuma |
+| role_uptime_kuma_container | uptime-kuma |
+| role_uptime_kuma_volume | uptime-kuma |
+| role_uptime_kuma_network | app-network |
+| role_uptime_kuma_cloudflared_token | |
 
 ## License
 
