@@ -1,10 +1,10 @@
 ---
 - name: set vars
   set_fact:
-    docker_image: '{{ app_uptime_kuma_docker_image }}'
-    docker_container: '{{ app_uptime_kuma_docker_container }}'
-    docker_volume: '{{ app_uptime_kuma_docker_volume }}'
-    docker_network: '{{ app_uptime_kuma_docker_network }}'
+    docker_image: '{{ role_uptime_kuma_image }}'
+    docker_container: '{{ role_uptime_kuma_container }}'
+    docker_volume: '{{ role_uptime_kuma_volume }}_data'
+    docker_network: '{{ role_uptime_kuma_network }}'
 
 - name: Ensure image is pulled
   community.docker.docker_image:
@@ -33,31 +33,31 @@
     name: "{{ docker_network }}"
     driver_options:
           com.docker.network.bridge.name: "br-{{ docker_network }}"
+  when:
+    role_uptime_kuma_cloudflared_token == ""
 
 - name: Create uptime-kuma container
   community.docker.docker_container:
     image: "{{ docker_image }}"
-    mounts:
-     - source: "{{ docker_volume }}"
-       target: /app/data
+    volumes:
+     - '{{ docker_volume }}:/app/data:Z'
     name: "{{ docker_container }}"
     networks:
      - name: "{{ docker_network }}"
     restart_policy: unless-stopped
     state: started
   when:
-    (pulled.changed or result.exists == false) and app_uptime_kuma_cloudflared_token == ""
+    (pulled.changed or result.exists == false) and role_uptime_kuma_cloudflared_token == ""
 
 - name: Create uptime-kuma container with cf reverse proxy
   community.docker.docker_container:
     image: "{{ docker_image }}"
-    mounts:
-     - source: "{{ docker_volume }}"
-       target: /app/data
+    volumes:
+     - '{{ docker_volume }}:/app/data:Z'
     name: "{{ docker_container }}"
     env:
-      UPTIME_KUMA_CLOUDFLARED_TOKEN: "{{ app_uptime_kuma_cloudflared_token }}"
+      UPTIME_KUMA_CLOUDFLARED_TOKEN: "{{ role_uptime_kuma_cloudflared_token }}"
     restart_policy: unless-stopped
     state: started
   when:
-    (pulled.changed or result.exists == false) and app_uptime_kuma_cloudflared_token != ""
+    (pulled.changed or result.exists == false) and role_uptime_kuma_cloudflared_token != ""
